@@ -2,12 +2,10 @@
 import SimpleLightbox from 'simplelightbox';
 // Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import { loader, loadMoreButton } from '../main';
 
 const galleryList = document.querySelector('.gallery');
-const loaderContainer = document.querySelector('.loader');
-const spinner = document.querySelector('.spinner');
-const spinnerBtn = document.querySelector('.spinner-btn');
+const loader = document.querySelector('.loader');
+const loadMoreBtn = document.querySelector('.load-more');
 
 let lightBox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',

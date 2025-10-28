@@ -5,6 +5,7 @@ import iziToast from "izitoast";
 // Додатковий імпорт стилів
 import "izitoast/dist/css/iziToast.min.css";
 
+
 import './css/spinner.css';
 import  { getImagesByQuery } from './js/pixabay-api.js'
 import {
@@ -12,6 +13,8 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
+  showLoadMoreButton,
+    hideLoadMoreButton,
 } from './js/render-functions.js';
 
 const form = document.querySelector(".form");
@@ -28,7 +31,7 @@ form.addEventListener('submit', async event => {
   event.preventDefault();
   clearGallery();
   
-const query = event.target.elements.query.value.trim();
+const query = event.target.elements['search-text'].value.trim();
 
 if (query === '') {
         iziToast.warning({
@@ -119,7 +122,7 @@ loadMoreBtn.addEventListener('click', async () => {
       });
     }
 
-    const shownSoFar = page * 15;
+    const shownSoFar = page * PER_PAGE;
     if (shownSoFar >= totalHits) {
       hideLoadMoreButton();
       iziToast.info({
