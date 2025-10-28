@@ -14,7 +14,7 @@ let lightBox = new SimpleLightbox('.gallery a', {
 });
 
 export function createGallery(images = []) {
-  galleryList.innerHTML = images
+  const markup = images
     .map(
       ({
         webformatURL,
