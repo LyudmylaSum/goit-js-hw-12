@@ -7,7 +7,7 @@ import "izitoast/dist/css/iziToast.min.css";
 
 
 import './css/spinner.css';
-import  { getImagesByQuery } from './js/pixabay-api.js'
+import  { getImagesByQuery, PER_PAGE } from './js/pixabay-api.js'
 import {
   createGallery,
   clearGallery,
@@ -23,6 +23,26 @@ const loadMoreBtn = document.querySelector('.load-more');
 let currentQuery = '';
 let page = 1;
 let totalHits = 0;
+
+
+const displayError = (message) => {
+    iziToast.error({
+        message: message,
+        position: 'topCenter',
+        timeout: 3000,
+        backgroundColor: '#EF4040',
+        messageColor: 'white',
+        close: false,
+    });
+};
+
+
+const displayEndMessage = () => {
+    iziToast.info({
+        message: "We're sorry, but you've reached the end of search results.",
+        position: 'topCenter',
+    });
+};
 
 hideLoadMoreButton();
 hideLoader();
@@ -51,44 +71,25 @@ if (query === '') {
   try {
     showLoader();
     const data = await getImagesByQuery(currentQuery, page);
-    hideLoader();
 
     if (!data.hits.length) {
-      iziToast.error({
-        message:
-          'Sorry, there are no images matching your search query. Please try again!',
-        position: 'topCenter',
-        timeout: 3000,
-        backgroundColor: '#EF4040',
-        messageColor: 'white',
-        close: false,
-      });
-      return;
+     displayError('Sorry, there are no images matching your search query. Please try again!');
+            return;
     }
 
     totalHits = data.totalHits;
     createGallery(data.hits);
 
-    if (page * 15 < totalHits) {
+    if (page * PER_PAGE < totalHits) {
       showLoadMoreButton();
     } else {
       hideLoadMoreButton();
-      iziToast.info({
-        message: "We're sorry, but you've reached the end of search results.",
-        position: 'topCenter',
-      });
+      displayEndMessage();
     }
   } catch (error) {
-    hideLoader();
-    iziToast.error({
-      message: error.message || 'An unexpected error occurred.',
-      position: 'topCenter',
-      timeout: 3000,
-      backgroundColor: '#EF4040',
-      messageColor: 'white',
-      close: false,
-    });
+    displayError(error.message || 'An unexpected error occurred.');
   } finally {
+    hideLoader();
     event.target.elements['search-text'].value = '';
   }
 });
@@ -96,18 +97,16 @@ if (query === '') {
 loadMoreBtn.addEventListener('click', async () => {
   page += 1;
 
+  hideLoadMoreButton();
+
   try {
     showLoader();
     const data = await getImagesByQuery(currentQuery, page);
-    hideLoader();
 
     if (!data.hits.length) {
       hideLoadMoreButton();
-      iziToast.info({
-        message: "We're sorry, but you've reached the end of search results.",
-        position: 'topCenter',
-      });
-      return;
+            displayEndMessage();
+            return;
     }
 
     createGallery(data.hits);
@@ -125,20 +124,14 @@ loadMoreBtn.addEventListener('click', async () => {
     const shownSoFar = page * PER_PAGE;
     if (shownSoFar >= totalHits) {
       hideLoadMoreButton();
-      iziToast.info({
-        message: "We're sorry, but you've reached the end of search results.",
-        position: 'topCenter',
-      });
-    }
+      displayEndMessage();
+    }else {
+      showLoadMoreButton();
+        }
   } catch (error) {
-    hideLoader();
-    iziToast.error({
-      message: error.message || 'An unexpected error occurred.',
-      position: 'topCenter',
-      timeout: 3000,
-      backgroundColor: '#EF4040',
-      messageColor: 'white',
-      close: false,
-    });
-  }
+    displayError(error.message || 'An unexpected error occurred.');
+        hideLoadMoreButton();
+  }finally {
+        hideLoader();
+    }
 });
